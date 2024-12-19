@@ -1,0 +1,45 @@
+A. Customer Journey
+Based off the 8 sample customers provided in the sample from the subscriptions table, 
+write a brief description about each customer’s onboarding journey.
+
+
+
+A. Customer Journey
+Based off the 8 sample customers provided in the sample from the subscriptions table, 
+write a brief description about each customer’s onboarding journey.
+
+
+WITH cte AS (
+    SELECT
+        t1.customer_id,
+        t1.plan_id,
+        t2.plan_name,
+        t2.price,
+        t1.start_date
+    FROM 
+        subscriptions AS t1
+    JOIN 
+        plans AS t2
+    ON 
+        t2.plan_id = t1.plan_id
+)
+SELECT
+    customer_id,
+    plan_name,
+    start_date
+FROM 
+    cte
+WHERE 
+    customer_id IN (1, 2, 11, 13, 15, 16, 18, 19)
+ORDER BY 
+    customer_id, plan_id ASC;
+
+Client #1: upgraded to the basic monthly subscription within their 7 day trial period.
+Client #2: upgraded to the pro annual subscription within their 7 day trial period.
+Client #11: cancelled their subscription within their 7 day trial period.
+Client #13: upgraded to the basic monthly subscription within their 7 day trial period and upgraded to pro annual 3 months later.
+Client #15: upgraded to the pro annual subscription within their 7 day trial period and cancelled the following month.
+Client #16: upgraded to the basic monthly subscription after their 7 day trial period and upgraded to pro annual almost 5 months later.
+Client #18: upgraded to the pro monthly subscription within their 7 day trial period.
+Client #19: upgraded to the pro monthly subscription within their 7 day trial period and upgraded to pro annual 2 months later.
+
