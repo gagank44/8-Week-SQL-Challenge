@@ -1,0 +1,50 @@
+**Cleaning tables(need to clean customer_order,runner_order)
+
+
+1) make it null wherever the string 'null' or blank
+update customer_orders
+set extras=NULL
+where extras='' or extras='null';
+
+update customer_orders
+set exclusions=NULL
+where exclusions='' or exclusions='null';
+
+select * from customer_orders
+
+# clean runner_order TABLE
+update runner_orders
+set pickup_time=NULL
+WHERE pickup_time='null';
+
+update runner_orders
+set distance=NULL
+WHERE distance='null';
+
+
+update runner_orders
+set distance=TRIM(REPLACE(distance,'km',''));
+
+update runner_orders
+set cancellation=NULL
+WHERE cancellation IN('null','')
+
+
+
+UPDATE runner_orders
+SET duration = (
+    SELECT 
+        CASE
+            WHEN duration LIKE '%minute%' THEN CAST(REPLACE(REPLACE(duration, 'minutes', ''), 'minute', '') AS INTEGER)
+            WHEN duration LIKE '%mins%' THEN CAST(REPLACE(duration, 'mins', '') AS INTEGER)
+            WHEN duration GLOB '*[0-9]*' THEN CAST(duration AS INTEGER)
+            ELSE NULL
+        END
+    FROM (SELECT runner_orders.duration)
+UPDATE runner_orders 
+SET distance = CAST(distance AS FLOAT);
+
+	
+	
+	
+	
