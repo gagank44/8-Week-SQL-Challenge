@@ -1,0 +1,113 @@
+ D. Pricing and Ratings
+1.If a Meat Lovers pizza costs $12 and Vegetarian costs $10 and there were no charges for changes 
+- how much money has Pizza Runner made so far if there are no delivery fees?
+
+SELECT 
+    '$' || SUM(
+        CASE
+            WHEN customer_orders.pizza_id = 1 THEN 12
+            ELSE 10
+        END
+    ) AS total_revenue
+FROM 
+    customer_orders
+JOIN 
+    pizza_names ON customer_orders.pizza_id = pizza_names.pizza_id
+JOIN 
+    runner_orders ON runner_orders.order_id = customer_orders.order_id
+WHERE 
+    runner_orders.cancellation IS NULL;
+
+
+2. What if there was an additional $1 charge for any pizza extras?Add cheese is $1 extra
+
+
+3.The Pizza Runner team now wants to add an additional ratings system that allows customers to rate their runner,
+ how would you design an additional table for this new dataset -
+ generate a schema for this new table and insert your own data for ratings 
+ for each successful customer order between 1 to 5.
+ 
+ CREATE TABLE ratings 
+ (order_id INTEGER,
+    rating INTEGER);
+INSERT INTO ratings
+ (order_id ,rating)
+VALUES 
+(1,3),
+(2,4),
+(3,5),
+(4,2),
+(5,1),
+(6,3),
+(7,4),
+(8,1),
+(9,3),
+(10,5); 
+SELECT * from ratings
+ 
+ 
+ 
+4.Using your newly generated table - can you join all of the information together to form a 
+table which has the following information for successful deliveries?
+customer_id
+order_id
+runner_id
+rating
+order_time
+pickup_time
+Time between order and pickup
+Delivery duration
+Average speed
+Total number of pizzas
+
+SELECT 
+    c.customer_id, 
+    c.order_id, 
+    r.runner_id, 
+    r2.rating, 
+    c.order_time, 
+    r.pickup_time, 
+    ROUND((JULIANDAY(r.pickup_time) - JULIANDAY(c.order_time)) * 24 * 60, 2) AS Time__order_pickup, 
+    r.duration, 
+    ROUND(AVG(r.distance / r.duration * 60), 2) AS avg_speed, 
+    COUNT(c.pizza_id) AS Pizza_Count
+FROM 
+    customer_orders c
+LEFT JOIN 
+    runner_orders r ON c.order_id = r.order_id 
+LEFT JOIN 
+    ratings r2 ON c.order_id = r2.order_id
+WHERE 
+    r.cancellation IS NULL
+GROUP BY 
+    c.customer_id, c.order_id, r.runner_id, r2.rating, c.order_time, r.pickup_time, r.duration
+ORDER BY 
+    c.customer_id;
+
+
+
+5If a Meat Lovers pizza was $12 and Vegetarian $10 fixed prices with no cost for extras and
+ each runner is paid $0.30 per kilometre traveled - how much money does Pizza Runner have 
+ left over after these deliveries?
+ 
+ with cte as(
+select 
+cu.order_id,
+sum(case when pizza_name = 'Meatlovers' THEN 12
+else 10 end )as pizza_price
+from pizza_names n
+join customer_orders cu on cu.pizza_id = n.pizza_id
+group by cu.order_id
+)
+select  
+sum(cte.pizza_price) as revenue,
+sum( r.distance*0.3) as total_cost,
+sum(cte.pizza_price) - sum( r.distance*0.3) as profit
+from  runner_orders r 
+join cte on r.order_id = cte.order_id
+where r.cancellation is null
+ 
+ 
+ 
+ 
+ 
